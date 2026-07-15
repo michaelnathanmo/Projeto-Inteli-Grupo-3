@@ -1,0 +1,153 @@
+{
+  "disclaimer": "Todos os dados neste arquivo são fictícios, criados exclusivamente para fins acadêmicos. Qualquer semelhança com empresas, produtos ou situações reais é mera coincidência.",
+  "company": {
+    "name": "Inteli Air",
+    "mission": "Conectar pessoas e destinos com excelência, segurança e inovação, promovendo uma experiência de voo única e acessível.",
+    "vision": "Ser referência em aviação regional na América Latina, reconhecida pela qualidade do serviço e pela valorização dos colaboradores.",
+    "values": [
+      {
+        "name": "Segurança em primeiro lugar",
+        "description": "Todas as decisões devem priorizar a segurança de passageiros e tripulantes."
+      },
+      {
+        "name": "Excelência no atendimento",
+        "description": "Oferecer um serviço acolhedor, eficiente e personalizado."
+      },
+      {
+        "name": "Inovação responsável",
+        "description": "Buscar soluções criativas com responsabilidade socioambiental."
+      },
+      {
+        "name": "Integridade e transparência",
+        "description": "Agir com ética, honestidade e clareza em todas as relações."
+      },
+      {
+        "name": "Valorização das pessoas",
+        "description": "Investir no desenvolvimento e bem-estar de colaboradores e comunidades."
+      },
+      {
+        "name": "Eficiência operacional",
+        "description": "Buscar a melhor relação entre custo, qualidade e pontualidade."
+      }
+    ]
+  },
+  "targetAudiences": [
+    {
+      "segment": "Viajantes a negócios",
+      "profile": "Profissionais que viajam frequentemente entre capitais e cidades médias, valorizam pontualidade, conforto e conectividade."
+    },
+    {
+      "segment": "Famílias",
+      "profile": "Grupos familiares buscando destinos de lazer, sensíveis a preço, horários convenientes e atendimento acolhedor."
+    },
+    {
+      "segment": "Jovens viajantes",
+      "profile": "Público entre 18 e 30 anos, interessado em destinos alternativos, preços acessíveis e experiência digital."
+    },
+    {
+      "segment": "Viajantes frequentes",
+      "profile": "Clientes fiéis que acumulam milhas e esperam benefícios exclusivos e reconhecimento."
+    },
+    {
+      "segment": "Turistas internacionais",
+      "profile": "Visitantes estrangeiros que utilizam voos regionais como conexão, valorizam sinalização bilíngue e suporte."
+    }
+  ],
+  "marketingCriteria": [
+    {
+      "criterion": "Alinhamento com valores da marca",
+      "question": "A proposta fortalece ou ao menos não contradiz os valores da Inteli Air?"
+    },
+    {
+      "criterion": "Adequação ao público-alvo",
+      "question": "A proposta atende necessidades reais de um segmento identificado de clientes?"
+    },
+    {
+      "criterion": "Diferenciação competitiva",
+      "question": "A proposta oferece algo que concorrentes não oferecem ou oferecem de forma inferior?"
+    },
+    {
+      "criterion": "Viabilidade de comunicação",
+      "question": "É possível comunicar a proposta de forma clara, objetiva e atraente?"
+    },
+    {
+      "criterion": "Potencial de engajamento",
+      "question": "A proposta tem potencial para gerar engajamento positivo nas redes sociais e na imprensa?"
+    },
+    {
+      "criterion": "Risco de imagem",
+      "question": "A proposta pode gerar percepção negativa junto a clientes, órgãos reguladores ou à sociedade?"
+    }
+  ],
+  "previousProjects": [
+    {
+      "title": "Check-in inteligente",
+      "description": "App com reconhecimento facial para agilizar o embarque.",
+      "result": "Bem-sucedido. Redução de 30% no tempo de fila. Melhorou a percepção de inovação da marca."
+    },
+    {
+      "title": "Programa de fidelidade jovem",
+      "description": "Milhas com descontos em experiências parceiras.",
+      "result": "Sucesso parcial. Atraiu novo público, mas teve baixa adesão inicial. Ajustado após 6 meses."
+    },
+    {
+      "title": "Central de atendimento por WhatsApp",
+      "description": "Canal exclusivo para remarcações e dúvidas.",
+      "result": "Alta satisfação dos clientes, mas demandou reforço na equipe. Considerado positivo."
+    },
+    {
+      "title": "Embarque preferencial para idosos",
+      "description": "Processo humanizado com voluntários treinados.",
+      "result": "Muito bem avaliado. Gerou matéria espontânea em veículo de imprensa regional."
+    },
+    {
+      "title": "Sala vip colaborativa",
+      "description": "Espaço de trabalho compartilhado em aeroportos selecionados.",
+      "result": "Cancelado após análise de viabilidade. Custos operacionais superaram projeções."
+    }
+  ],
+  "externalExamples": [
+    {
+      "company": "GOL",
+      "initiative": "Smiles & Milhas",
+      "lesson": "Programas de fidelidade bem estruturados aumentam retenção de clientes."
+    },
+    {
+      "company": "Latam",
+      "initiative": "Passaporte Latam Pass",
+      "lesson": "Parcerias com varejo ampliam o alcance do programa de milhas."
+    },
+    {
+      "company": "Azul",
+      "initiative": "Azul Viagens",
+      "lesson": "Pacotes de viagem completos geram receita adicional e fidelizam."
+    },
+    {
+      "company": "Emirates",
+      "initiative": "Atendimento personalizado em classe executiva",
+      "lesson": "Investimento em experiência do passageiro justifica preços premium."
+    },
+    {
+      "company": "Ryanair",
+      "initiative": "Serviços modulares e taxa por bagagem",
+      "lesson": "Transparência na precificação de serviços adicionais evita frustração."
+    }
+  ],
+  "commonRisks": [
+    "Projeto pode gerar custos operacionais não previstos",
+    "Mudanças regulatórias podem afetar a viabilidade",
+    "Baixa adesão do público-alvo se a comunicação não for eficaz",
+    "Impacto na operação durante a implementação",
+    "Necessidade de treinamento da equipe",
+    "Problemas de integração com sistemas legados",
+    "Resistência interna à mudança",
+    "Prazo otimista pode comprometer a qualidade"
+  ],
+  "observations": [
+    "Toda campanha deve ser testada em aeroportos piloto antes do rollout nacional.",
+    "A marca Inteli Air não deve ser associada a posicionamentos políticos ou religiosos.",
+    "Comunicações devem priorizar tom positivo, acolhedor e informativo.",
+    "Feedbacks de clientes devem ser monitorados em até 48h após o lançamento.",
+    "Projetos com impacto direto em segurança exigem aprovação adicional da área técnica."
+  ]
+}
