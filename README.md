@@ -2,6 +2,8 @@
 
 Projeto acadêmico do Inteli Camp. Todos os dados são fictícios.
 
+**Problema central:** Falta de comunicação das Unidades de Negócio da Azul com o marketing — distanciamento da campanha aos ideais da empresa, falta de tempo para correção, perda de valor do produto.
+
 ## Sobre
 
 Aplicação web para melhorar a comunicação entre as unidades de negócio (logística, manutenção, operações, atendimento) e o setor de marketing de uma companhia aérea fictícia.
@@ -73,7 +75,7 @@ package.json         Dependências do projeto
 3. Adicione no arquivo `.env`:
    ```
    OPENROUTER_API_KEY=sk-or-v1-sua-chave-aqui
-   OPENROUTER_MODEL=deepseek/deepseek-v4-flash:free
+   OPENROUTER_MODEL=openrouter/free
    ```
 
 Se a chave não estiver configurada, o restante do sistema funciona normalmente — apenas o refinamento por IA fica indisponível.

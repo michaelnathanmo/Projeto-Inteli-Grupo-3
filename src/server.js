@@ -98,7 +98,7 @@ app.post('/api/projects/:projectId/refine', async (req, res) => {
     }
 
     if (!isAiAvailable()) {
-      return res.status(503).json({ error: 'OPENROUTER_API_KEY não configurada. O refinamento por IA está indisponível.' });
+      return res.status(503).json({ error: 'OPENROUTER_API_KEY não configurada. Configure no .env.' });
     }
 
     const project = await refineProject(projectId);
@@ -275,7 +275,7 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
-  console.log(`IA disponível: ${isAiAvailable() ? 'Sim' : 'Não (configure OPENROUTER_API_KEY no .env)'}`);
+  console.log(`IA disponível: ${isAiAvailable() ? 'Sim (OpenRouter)' : 'Não (configure OPENROUTER_API_KEY no .env)'}`);
 });
 
 // Graceful shutdown

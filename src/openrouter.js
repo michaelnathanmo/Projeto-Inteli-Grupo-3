@@ -6,15 +6,15 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const MODEL = process.env.OPENROUTER_MODEL || 'google/gemini-2.0-flash-exp:free';
+const MODEL = process.env.OPENROUTER_MODEL || 'openrouter/free';
 
 export function isAiAvailable() {
   return !!process.env.OPENROUTER_API_KEY;
 }
 
 export async function refineWithAi(projectData, projectHistory) {
-  if (!isAiAvailable()) {
-    throw new Error('OPENROUTER_API_KEY não configurada. O refinamento por IA está indisponível.');
+  if (!process.env.OPENROUTER_API_KEY) {
+    throw new Error('OPENROUTER_API_KEY não configurada. Configure no .env.');
   }
 
   const knowledgeBasePath = path.join(__dirname, '..', 'data', 'knowledge-base.json');
@@ -42,8 +42,12 @@ export async function refineWithAi(projectData, projectHistory) {
         temperature: 0.7,
         max_tokens: 4000,
       }),
+      signal: AbortSignal.timeout(60000),
     });
   } catch (fetchError) {
+    if (fetchError.name === 'TimeoutError' || fetchError.name === 'AbortError') {
+      throw new Error('A requisição ao OpenRouter excedeu o tempo limite (60s). O modelo pode estar ocupado.');
+    }
     throw new Error(`Erro de conexão com o OpenRouter: ${fetchError.message}`);
   }
 
@@ -64,9 +68,14 @@ export async function refineWithAi(projectData, projectHistory) {
     throw new Error(`Resposta inválida do OpenRouter: ${parseError.message}`);
   }
 
-  const content = data?.choices?.[0]?.message?.content;
+  let content = data?.choices?.[0]?.message?.content;
   if (!content) {
-    throw new Error('Resposta do OpenRouter não contém conteúdo válido.');
+    const reasoning = data?.choices?.[0]?.message?.reasoning;
+    if (reasoning) {
+      content = reasoning;
+    } else {
+      throw new Error('Resposta do OpenRouter não contém conteúdo válido.');
+    }
   }
 
   let parsed;
@@ -187,10 +196,12 @@ Analise esta ideia seguindo as regras estabelecidas e retorne APENAS o JSON no f
 
 function extractJson(text) {
   const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (jsonMatch) {
-    return jsonMatch[0];
-  }
-  return text;
+  if (!jsonMatch) return text;
+  let raw = jsonMatch[0];
+  raw = raw.replace(/,\s*([\]}])/g, '$1');
+  raw = raw.replace(/([{,]\s*)'([^']+)'\s*:/g, '$1"$2":');
+  raw = raw.replace(/:\s*'([^']+)'/g, ': "$1"');
+  return raw;
 }
 
 function validateAiResponse(data) {

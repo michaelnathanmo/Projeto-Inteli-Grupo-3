@@ -508,6 +508,7 @@ function renderNewProposal() {
             </div>
             <div class="action-bar" style="border-top:none;padding-top:0;margin-top:8px;">
               <button type="submit" class="btn btn-primary">Salvar Proposta</button>
+              <button type="button" class="btn btn-secondary" onclick="quickFill()">⚡ Preencher exemplo</button>
               <button type="button" class="btn btn-secondary" onclick="navigate('requester/dashboard')">Cancelar</button>
             </div>
           </form>
@@ -516,6 +517,47 @@ function renderNewProposal() {
     </div>
   `;
 }
+
+window.quickFill = function () {
+  const samples = [
+    {
+      title: 'Embarque facilitado para famílias',
+      businessUnit: 'Operações aeroportuárias',
+      problem: 'Famílias com crianças pequenas enfrentam dificuldades no embarque, causando estresse e atrasos nas conexões.',
+      idea: 'Criar um processo diferenciado para famílias com crianças pequenas, oferecendo orientações antecipadas por email e um canal de embarque prioritário.',
+      expectedBenefit: 'Redução do estresse das famílias, agilidade no embarque e melhoria da experiência do cliente.',
+      targetUsers: 'Famílias com crianças de até 5 anos que utilizam voos nacionais.',
+      deadline: '3 meses',
+    },
+    {
+      title: 'App de acompanhamento de manutenção',
+      businessUnit: 'Manutenção',
+      problem: 'Técnicos de manutenção não têm acesso rápido ao histórico de reparos das aeronaves quando estão em campo.',
+      idea: 'Desenvolver um aplicativo mobile que centralize o histórico de manutenção, checklist digital e notificações de peças com reposição automática.',
+      expectedBenefit: 'Redução de 30% no tempo de diagnóstico e aumento da precisão dos reparos.',
+      targetUsers: 'Técnicos de manutenção e engenheiros de frota.',
+      deadline: '6 meses',
+    },
+    {
+      title: 'Chatbot para remarcação de voos',
+      businessUnit: 'Atendimento ao cliente',
+      problem: 'Alto volume de chamadas para remarcação em situações de mau tempo gera filas e insatisfação.',
+      idea: 'Implementar um chatbot no WhatsApp e no site que permita remarcação autônoma sem falar com atendente.',
+      expectedBenefit: 'Redução de 40% das chamadas e agilidade no atendimento.',
+      targetUsers: 'Passageiros com voos nacionais que precisam remarcar.',
+      deadline: '4 meses',
+    },
+  ];
+  const pick = samples[Math.floor(Math.random() * samples.length)];
+  document.getElementById('title').value = pick.title;
+  document.getElementById('businessUnit').value = pick.businessUnit;
+  document.getElementById('problem').value = pick.problem;
+  document.getElementById('idea').value = pick.idea;
+  document.getElementById('expectedBenefit').value = pick.expectedBenefit;
+  document.getElementById('targetUsers').value = pick.targetUsers;
+  document.getElementById('estimatedDeadline').value = pick.deadline;
+  document.getElementById('formMessages').innerHTML = '<div class="alert alert-info">Formulário preenchido com exemplo aleatório. Edite ou salve.</div>';
+};
 
 window.submitProposal = async function (event) {
   event.preventDefault();
@@ -902,7 +944,7 @@ window.refineWithAi = async function (projectId) {
 
   const actionDiv = document.querySelector('.detail-section:last-child .action-bar');
   if (actionDiv) {
-    actionDiv.innerHTML = '<div class="loading"><div class="spinner"></div> Processando com IA... Isso pode levar alguns segundos.</div>';
+    actionDiv.innerHTML = '<div class="loading"><div class="spinner"></div> <span>Processando com IA... (pode levar até 1 minuto no plano gratuito)</span></div>';
   }
 
   try {
