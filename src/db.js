@@ -73,6 +73,16 @@ function initTables() {
       FOREIGN KEY (project_id) REFERENCES projects(id),
       FOREIGN KEY (evaluated_version_id) REFERENCES project_versions(id)
     );
+
+    CREATE TABLE IF NOT EXISTS chat_messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      project_id INTEGER,
+      sender TEXT NOT NULL,
+      sender_role TEXT NOT NULL,
+      message TEXT NOT NULL,
+      created_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (project_id) REFERENCES projects(id)
+    );
   `);
 }
 
