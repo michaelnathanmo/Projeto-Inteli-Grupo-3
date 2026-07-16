@@ -90,7 +90,7 @@ function navigate(hash) {
 }
 
 function getRoute() {
-  const hash = window.location.hash.slice(1) || 'login';
+  const hash = window.location.hash.slice(1) || 'requester/dashboard';
   const parts = hash.split('/');
   return { page: parts[0], params: parts.slice(1) };
 }
@@ -99,15 +99,7 @@ function getRoute() {
 function render() {
   const { page, params } = getRoute();
 
-  if (page === 'login') {
-    renderLogin();
-    return;
-  }
-
-  if (!state.user) {
-    navigate('login');
-    return;
-  }
+  if (!state.user) return;
 
   if (page === 'requester' && params[0] === 'new') {
     renderNewProposal();
@@ -128,81 +120,7 @@ function render() {
   }
 }
 
-// === LOGIN ===
-function renderLogin() {
-  const app = document.getElementById('app');
-  app.innerHTML = `
-    <div class="login-page">
-      <div class="login-card">
-        <div class="airline-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 2L11 13"></path>
-            <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
-          </svg>
-        </div>
-        <h1>Azul</h1>
-        <p>Sistema de Comunicação entre Verticais e Marketing</p>
-        <p style="font-size:0.8125rem;margin-bottom:24px;color:var(--gray-400);">Selecione seu perfil para acessar o sistema</p>
-        <div class="role-options">
-          <button class="role-btn" onclick="selectRole('requester')">
-            <div class="role-icon requester">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-            </div>
-            <div class="role-info">
-              <h3>Solicitante</h3>
-              <span>Criar e gerenciar propostas</span>
-            </div>
-          </button>
-          <button class="role-btn" onclick="selectRole('marketing')">
-            <div class="role-icon marketing">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9d174d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-              </svg>
-            </div>
-            <div class="role-info">
-              <h3>Marketing</h3>
-              <span>Análise consultiva de propostas</span>
-            </div>
-          </button>
-          <button class="role-btn" onclick="selectRole('management')">
-            <div class="role-icon management">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 20V10"></path>
-                <path d="M18 20V4"></path>
-                <path d="M6 20v-4"></path>
-              </svg>
-            </div>
-            <div class="role-info">
-              <h3>Gerência</h3>
-              <span>Decisão final sobre propostas</span>
-            </div>
-          </button>
-        </div>
-        <p style="margin-top:24px;font-size:0.75rem;color:var(--gray-400);">
-          Projeto acadêmico Inteli Camp · Dados fictícios
-        </p>
-      </div>
-    </div>
-  `;
-}
-
-window.selectRole = function (role) {
-  const names = {
-    requester: 'Ana Silva',
-    marketing: 'Carlos Mendes',
-    management: 'Dra. Beatriz Oliveira',
-  };
-  state.user = { role, name: names[role] };
-  const dashboards = {
-    requester: 'requester/dashboard',
-    marketing: 'marketing/dashboard',
-    management: 'management/dashboard',
-  };
-  navigate(dashboards[role]);
-};
+// === DASHBOARD ===
 
 // === DASHBOARD ===
 function renderDashboard(role) {
@@ -1917,13 +1835,10 @@ function setupChatProjectChannel() {
 // Hook into existing render to inject chat
 const _origRender = render;
 render = function () {
-  const { page } = getRoute();
   _origRender();
-  if (page !== 'login') {
-    injectChatToggle();
-    injectChatPanel();
-    setupChatProjectChannel();
-  }
+  injectChatToggle();
+  injectChatPanel();
+  setupChatProjectChannel();
 };
 
 // === INIT ===

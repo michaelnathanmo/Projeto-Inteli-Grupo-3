@@ -107,7 +107,7 @@
   <script>
     (function() {
       var user = window.__SESSION_USER__;
-      if (user && typeof state !== 'undefined' && typeof selectRole === 'function') {
+      if (user && typeof state !== 'undefined') {
         state.user = { role: user.role, name: user.name };
         var dashboards = {
           requester: 'requester/dashboard',
