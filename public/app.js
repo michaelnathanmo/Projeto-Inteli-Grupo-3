@@ -381,12 +381,7 @@ window.setFilter = function (key, role) {
 
 // === SIDEBAR ===
 function renderSidebar(role) {
-  const dashboards = {
-    requester: 'requester/dashboard',
-    marketing: 'marketing/dashboard',
-    management: 'management/dashboard',
-  };
-
+  const profile = getProfileData(role);
   const links = {
     requester: [
       { href: 'requester/dashboard', icon: icon('grid'), label: 'Painel' },
@@ -412,8 +407,112 @@ function renderSidebar(role) {
           </a>
         `).join('')}
       </nav>
+      <div class="sidebar-profile">
+        <button class="profile-tab" id="profileTabBtn" type="button">
+          <div class="profile-avatar">${profile.name.charAt(0)}</div>
+          <span class="profile-name">${profile.name}</span>
+          <svg class="profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
     </aside>
   `;
+}
+
+window.toggleProfile = function () {};
+
+var _profilePopupRole = null;
+
+function getProfileData(role) {
+  var profiles = {
+    requester: { name: 'Ana Silva', gender: 'Feminino', position: 'Analista de Projetos' },
+    marketing: { name: 'Carlos Mendes', gender: 'Masculino', position: 'Coordenador de Marketing' },
+    management: { name: 'Dra. Beatriz Oliveira', gender: 'Feminino', position: 'Diretora de Operações' },
+  };
+  return profiles[role] || profiles.requester;
+}
+
+function createProfilePopup() {
+  var existing = document.getElementById('profilePopupFixed');
+  if (existing) existing.remove();
+
+  var role = state.user ? state.user.role : null;
+  if (!role) return;
+  _profilePopupRole = role;
+
+  var profile = getProfileData(role);
+
+  var popup = document.createElement('div');
+  popup.id = 'profilePopupFixed';
+  popup.innerHTML = `
+    <div class="profile-popup-card">
+      <div class="profile-popup-header">
+        <div class="profile-popup-avatar">${profile.name.charAt(0)}</div>
+        <div class="profile-popup-info">
+          <div class="profile-popup-name">${profile.name}</div>
+          <div class="profile-popup-position">${profile.position}</div>
+        </div>
+      </div>
+      <div class="profile-popup-details">
+        <div class="profile-detail-row">
+          <span class="profile-detail-label">Nome</span>
+          <span class="profile-detail-value">${profile.name}</span>
+        </div>
+        <div class="profile-detail-row">
+          <span class="profile-detail-label">Sexo</span>
+          <span class="profile-detail-value">${profile.gender}</span>
+        </div>
+        <div class="profile-detail-row">
+          <span class="profile-detail-label">Cargo</span>
+          <span class="profile-detail-value">${profile.position}</span>
+        </div>
+      </div>
+    </div>
+  `;
+  popup.addEventListener('click', function (e) {
+    if (e.target === popup) {
+      popup.style.display = 'none';
+    }
+  });
+  document.body.appendChild(popup);
+}
+
+function setupProfileTab() {
+  var btn = document.getElementById('profileTabBtn');
+  if (!btn) return;
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+
+    if (!document.getElementById('profilePopupFixed')) {
+      createProfilePopup();
+    }
+
+    var popup = document.getElementById('profilePopupFixed');
+    if (!popup) return;
+
+    var rect = btn.getBoundingClientRect();
+    popup.style.left = rect.left + 'px';
+    popup.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+    popup.style.top = 'auto';
+    popup.style.right = 'auto';
+
+    if (popup.style.display === 'block') {
+      popup.style.display = 'none';
+      btn.classList.remove('active');
+    } else {
+      popup.style.display = 'block';
+      btn.classList.add('active');
+    }
+  });
+}
+
+function cleanupProfilePopup() {
+  var popup = document.getElementById('profilePopupFixed');
+  if (popup) popup.style.display = 'none';
+  var btn = document.getElementById('profileTabBtn');
+  if (btn) btn.classList.remove('active');
 }
 
 function renderHeader(role) {
@@ -1616,5 +1715,44 @@ function escapeHtml(str) {
 }
 
 // === INIT ===
-window.addEventListener('hashchange', render);
+window.addEventListener('hashchange', function () { cleanupProfilePopup(); render(); });
 window.addEventListener('load', render);
+
+var _profileObserver = new MutationObserver(function () {
+  var btn = document.getElementById('profileTabBtn');
+  if (btn && !btn._bound) {
+    btn._bound = true;
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+
+      if (!document.getElementById('profilePopupFixed')) {
+        createProfilePopup();
+      }
+
+      var popup = document.getElementById('profilePopupFixed');
+      if (!popup) return;
+
+      var rect = btn.getBoundingClientRect();
+      popup.style.left = rect.left + 'px';
+      popup.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+      popup.style.top = 'auto';
+      popup.style.right = 'auto';
+
+      if (popup.style.display === 'block') {
+        popup.style.display = 'none';
+        btn.classList.remove('active');
+      } else {
+        popup.style.display = 'block';
+        btn.classList.add('active');
+      }
+    });
+  }
+});
+_profileObserver.observe(document.getElementById('app'), { childList: true, subtree: true });
+
+document.addEventListener('click', function () {
+  var popup = document.getElementById('profilePopupFixed');
+  if (popup) popup.style.display = 'none';
+  var btn = document.getElementById('profileTabBtn');
+  if (btn) btn.classList.remove('active');
+});
