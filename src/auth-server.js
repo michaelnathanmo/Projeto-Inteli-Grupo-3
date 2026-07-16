@@ -25,6 +25,7 @@ import {
 } from './validation.js';
 import { isAiAvailable } from './openrouter.js';
 import { authRouter, requireAuth } from './auth.js';
+import { getMessages, sendMessage } from './chat-service.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -248,6 +249,38 @@ app.post('/api/seed', (req, res) => {
   } catch (err) {
     console.error('Erro ao criar dados de demonstração:', err);
     res.status(500).json({ error: 'Erro ao criar dados de demonstração.' });
+  }
+});
+
+app.get('/api/chat/messages', (req, res) => {
+  try {
+    const projectId = req.query.project_id ? parseInt(req.query.project_id, 10) : null;
+    const messages = getMessages(projectId);
+    res.json(messages);
+  } catch (err) {
+    console.error('Erro ao carregar mensagens:', err);
+    res.status(500).json({ error: 'Erro interno ao carregar mensagens.' });
+  }
+});
+
+app.post('/api/chat/messages', (req, res) => {
+  try {
+    const { projectId, message } = req.body;
+    if (!message || !message.trim()) {
+      return res.status(400).json({ error: 'Mensagem é obrigatória.' });
+    }
+    const sender = req.user?.name || 'Desconhecido';
+    const senderRole = req.user?.role || 'requester';
+    const msg = sendMessage({
+      projectId: projectId ? parseInt(projectId, 10) : null,
+      sender,
+      senderRole,
+      message: message.trim(),
+    });
+    res.status(201).json(msg);
+  } catch (err) {
+    console.error('Erro ao enviar mensagem:', err);
+    res.status(500).json({ error: 'Erro interno ao enviar mensagem.' });
   }
 });
 

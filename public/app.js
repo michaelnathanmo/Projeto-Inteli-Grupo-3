@@ -1714,6 +1714,218 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+// === CHAT ===
+const chatState = {
+  open: false,
+  messages: [],
+  channel: 'general',
+  unreadCount: 0,
+  lastPoll: null,
+  pollInterval: null,
+};
+
+function injectChatToggle() {
+  const existing = document.getElementById('chatToggleBtn');
+  if (existing) return;
+  const btn = document.createElement('button');
+  btn.id = 'chatToggleBtn';
+  btn.className = 'chat-toggle-btn';
+  btn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg><span class="chat-badge" id="chatBadge" style="display:none">0</span>`;
+  btn.addEventListener('click', toggleChat);
+  document.body.appendChild(btn);
+}
+
+function injectChatPanel() {
+  const existing = document.getElementById('chatPanel');
+  if (existing) return;
+  const panel = document.createElement('div');
+  panel.id = 'chatPanel';
+  panel.className = 'chat-panel';
+  panel.innerHTML = `
+    <div class="chat-header">
+      <h3>Chat</h3>
+      <button class="chat-close-btn" onclick="toggleChat()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <div class="chat-channels" id="chatChannels">
+      <button class="chat-channel active" data-channel="general" onclick="switchChatChannel('general')">Geral</button>
+      <button class="chat-channel" data-channel="project" onclick="switchChatChannel('project')" id="projectChannelBtn" style="display:none">Projeto</button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+      <textarea class="chat-input" id="chatInput" placeholder="Digite sua mensagem..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage()}"></textarea>
+      <button class="chat-send-btn" onclick="sendChatMessage()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </div>
+  `;
+  document.body.appendChild(panel);
+  autoResizeChatInput();
+}
+
+function autoResizeChatInput() {
+  const input = document.getElementById('chatInput');
+  if (!input) return;
+  input.addEventListener('input', function () {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+}
+
+window.toggleChat = function () {
+  chatState.open = !chatState.open;
+  const panel = document.getElementById('chatPanel');
+  const btn = document.getElementById('chatToggleBtn');
+  if (panel) panel.classList.toggle('open', chatState.open);
+  if (btn) btn.classList.toggle('active', chatState.open);
+  if (chatState.open) {
+    chatState.unreadCount = 0;
+    updateChatBadge();
+    loadChatMessages();
+    startChatPolling();
+    document.getElementById('chatInput')?.focus();
+  } else {
+    stopChatPolling();
+  }
+};
+
+window.switchChatChannel = function (channel) {
+  chatState.channel = channel;
+  document.querySelectorAll('.chat-channel').forEach(b => b.classList.toggle('active', b.dataset.channel === channel));
+  loadChatMessages();
+};
+
+function getChatProjectId() {
+  if (chatState.channel === 'project' && state.currentProject) {
+    return state.currentProject.id;
+  }
+  return null;
+}
+
+async function loadChatMessages() {
+  try {
+    const projectId = getChatProjectId();
+    const url = projectId ? `/api/chat/messages?project_id=${projectId}` : '/api/chat/messages';
+    const messages = await api(url);
+    chatState.messages = messages;
+    renderChatMessages();
+  } catch (err) {
+    console.error('Erro ao carregar mensagens:', err);
+  }
+}
+
+function renderChatMessages() {
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+  if (chatState.messages.length === 0) {
+    container.innerHTML = '<div class="chat-empty">Nenhuma mensagem ainda. Seja o primeiro a escrever!</div>';
+    return;
+  }
+  container.innerHTML = chatState.messages.map(m => {
+    const roleClass = m.senderRole || 'requester';
+    const roleLabels = { requester: 'Solicitante', marketing: 'Marketing', management: 'Gerência' };
+    const roleLabel = roleLabels[m.senderRole] || m.senderRole;
+    const time = new Date(m.createdAt + 'Z').toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const initials = m.sender ? m.sender.charAt(0).toUpperCase() : '?';
+    return `
+      <div class="chat-msg">
+        <div class="chat-msg-avatar ${roleClass}">${initials}</div>
+        <div class="chat-msg-body">
+          <div class="chat-msg-header">
+            <span class="chat-msg-name">${escapeHtml(m.sender)}</span>
+            <span class="chat-msg-role ${roleClass}">${roleLabel}</span>
+            <span class="chat-msg-time">${time}</span>
+          </div>
+          <div class="chat-msg-text">${escapeHtml(m.message)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+window.sendChatMessage = async function () {
+  const input = document.getElementById('chatInput');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  try {
+    const projectId = getChatProjectId();
+    await api('/api/chat/messages', {
+      method: 'POST',
+      body: JSON.stringify({ projectId, message: text }),
+    });
+    await loadChatMessages();
+  } catch (err) {
+    console.error('Erro ao enviar mensagem:', err);
+  }
+};
+
+function startChatPolling() {
+  stopChatPolling();
+  chatState.pollInterval = setInterval(async () => {
+    if (!chatState.open) return;
+    try {
+      const projectId = getChatProjectId();
+      const url = projectId ? `/api/chat/messages?project_id=${projectId}` : '/api/chat/messages';
+      const messages = await api(url);
+      if (messages.length > chatState.messages.length) {
+        chatState.messages = messages;
+        renderChatMessages();
+      }
+    } catch (err) {
+      // ignore polling errors
+    }
+  }, 5000);
+}
+
+function stopChatPolling() {
+  if (chatState.pollInterval) {
+    clearInterval(chatState.pollInterval);
+    chatState.pollInterval = null;
+  }
+}
+
+function updateChatBadge() {
+  const badge = document.getElementById('chatBadge');
+  if (!badge) return;
+  if (chatState.unreadCount > 0) {
+    badge.textContent = chatState.unreadCount;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function setupChatProjectChannel() {
+  const btn = document.getElementById('projectChannelBtn');
+  if (!btn) return;
+  if (state.currentProject) {
+    btn.style.display = 'flex';
+    btn.textContent = `Projeto: ${state.currentProject.title.substring(0, 20)}${state.currentProject.title.length > 20 ? '...' : ''}`;
+  } else {
+    btn.style.display = 'none';
+    if (chatState.channel === 'project') {
+      switchChatChannel('general');
+    }
+  }
+}
+
+// Hook into existing render to inject chat
+const _origRender = render;
+render = function () {
+  const { page } = getRoute();
+  _origRender();
+  if (page !== 'login') {
+    injectChatToggle();
+    injectChatPanel();
+    setupChatProjectChannel();
+  }
+};
+
 // === INIT ===
 window.addEventListener('hashchange', function () { cleanupProfilePopup(); render(); });
 window.addEventListener('load', render);
