@@ -437,10 +437,7 @@ function renderHeader(role) {
   return `
     <header class="app-header">
       <div class="logo">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 2L11 13"></path>
-          <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
-        </svg>
+        <img src="/logos/azul_elos_final.png" alt="Azul E.L.O.S." height="32">
         Azul E.L.O.S.
       </div>
       <div class="user-info">

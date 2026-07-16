@@ -73,9 +73,10 @@ a:hover {
   gap: 8px;
 }
 
-.app-header .logo svg {
-  width: 28px;
-  height: 28px;
+.app-header .logo img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .app-header .user-info {

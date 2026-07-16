@@ -290,8 +290,9 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'login.html'));
 });
 
-app.use(requireAuth);
+app.use('/logos', express.static(path.join(__dirname, '..', 'logos')));
 
+app.use(requireAuth);
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.get('*', (req, res) => {
