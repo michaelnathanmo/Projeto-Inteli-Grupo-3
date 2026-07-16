@@ -6,10 +6,70 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const MODEL = process.env.OPENROUTER_MODEL || 'openrouter/free';
+
+const FALLBACK_MODELS = [
+  process.env.OPENROUTER_MODEL || 'openrouter/free',
+  'google/gemma-4-26b-a4b-it:free',
+  'nvidia/nemotron-nano-9b-v2:free',
+  'meta-llama/llama-3.2-3b-instruct:free',
+];
 
 export function isAiAvailable() {
   return !!process.env.OPENROUTER_API_KEY;
+}
+
+async function tryCallModel(model, systemPrompt, userPrompt) {
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+      'HTTP-Referer': 'http://localhost:3000',
+      'X-Title': 'Inteli Camp - Projeto 3',
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      temperature: 0.7,
+      max_tokens: 4000,
+    }),
+    signal: AbortSignal.timeout(120000),
+  });
+
+  if (!response.ok) {
+    let errorBody = '';
+    try {
+      errorBody = await response.text();
+    } catch {
+      errorBody = '(resposta não legível)';
+    }
+    throw new Error(`OpenRouter (${model}) retornou erro ${response.status}: ${errorBody}`);
+  }
+
+  let data;
+  try {
+    data = await response.json();
+  } catch (parseError) {
+    throw new Error(`Resposta inválida do OpenRouter (${model}): ${parseError.message}`);
+  }
+
+  let content = data?.choices?.[0]?.message?.content;
+  if (!content) {
+    const reasoning = data?.choices?.[0]?.message?.reasoning;
+    if (reasoning) {
+      content = reasoning;
+    } else {
+      throw new Error(`Resposta do OpenRouter (${model}) não contém conteúdo válido.`);
+    }
+  }
+
+  const cleaned = extractJson(content);
+  const parsed = JSON.parse(cleaned);
+  validateAiResponse(parsed);
+  return parsed;
 }
 
 export async function refineWithAi(projectData, projectHistory) {
@@ -23,72 +83,23 @@ export async function refineWithAi(projectData, projectHistory) {
   const systemPrompt = buildSystemPrompt(knowledgeBase);
   const userPrompt = buildUserPrompt(projectData, projectHistory);
 
-  let response;
-  try {
-    response = await fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        'HTTP-Referer': 'http://localhost:3000',
-        'X-Title': 'Inteli Camp - Projeto 3',
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        temperature: 0.7,
-        max_tokens: 4000,
-      }),
-      signal: AbortSignal.timeout(60000),
-    });
-  } catch (fetchError) {
-    if (fetchError.name === 'TimeoutError' || fetchError.name === 'AbortError') {
-      throw new Error('A requisição ao OpenRouter excedeu o tempo limite (60s). O modelo pode estar ocupado.');
-    }
-    throw new Error(`Erro de conexão com o OpenRouter: ${fetchError.message}`);
-  }
+  let lastError = null;
 
-  if (!response.ok) {
-    let errorBody = '';
+  for (const model of FALLBACK_MODELS) {
     try {
-      errorBody = await response.text();
-    } catch {
-      errorBody = '(resposta não legível)';
-    }
-    throw new Error(`OpenRouter retornou erro ${response.status}: ${errorBody}`);
-  }
-
-  let data;
-  try {
-    data = await response.json();
-  } catch (parseError) {
-    throw new Error(`Resposta inválida do OpenRouter: ${parseError.message}`);
-  }
-
-  let content = data?.choices?.[0]?.message?.content;
-  if (!content) {
-    const reasoning = data?.choices?.[0]?.message?.reasoning;
-    if (reasoning) {
-      content = reasoning;
-    } else {
-      throw new Error('Resposta do OpenRouter não contém conteúdo válido.');
+      console.log(`Tentando modelo: ${model}`);
+      const result = await tryCallModel(model, systemPrompt, userPrompt);
+      console.log(`Modelo ${model} funcionou!`);
+      return result;
+    } catch (error) {
+      console.error(`Modelo ${model} falhou: ${error.message}`);
+      lastError = error;
     }
   }
 
-  let parsed;
-  try {
-    const cleaned = extractJson(content);
-    parsed = JSON.parse(cleaned);
-  } catch (parseError) {
-    throw new Error(`Não foi possível interpretar a resposta da IA como JSON: ${parseError.message}`);
+  if (lastError) {
+    throw new Error(`Todos os modelos falharam. Último erro: ${lastError.message}`);
   }
-
-  validateAiResponse(parsed);
-
-  return parsed;
 }
 
 function buildSystemPrompt(knowledgeBase) {
@@ -196,7 +207,10 @@ Analise esta ideia seguindo as regras estabelecidas e retorne APENAS o JSON no f
 
 function extractJson(text) {
   const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) return text;
+  if (!jsonMatch) {
+    console.error('Nenhum JSON encontrado na resposta. Resposta bruta:', text.substring(0, 500));
+    return text;
+  }
   let raw = jsonMatch[0];
   raw = raw.replace(/,\s*([\]}])/g, '$1');
   raw = raw.replace(/([{,]\s*)'([^']+)'\s*:/g, '$1"$2":');

@@ -1,7 +1,7 @@
 {
   "disclaimer": "Todos os dados neste arquivo são fictícios, criados exclusivamente para fins acadêmicos. Qualquer semelhança com empresas, produtos ou situações reais é mera coincidência.",
   "company": {
-    "name": "Inteli Air",
+    "name": "Azul",
     "mission": "Conectar pessoas e destinos com excelência, segurança e inovação, promovendo uma experiência de voo única e acessível.",
     "vision": "Ser referência em aviação regional na América Latina, reconhecida pela qualidade do serviço e pela valorização dos colaboradores.",
     "values": [
@@ -56,7 +56,7 @@
   "marketingCriteria": [
     {
       "criterion": "Alinhamento com valores da marca",
-      "question": "A proposta fortalece ou ao menos não contradiz os valores da Inteli Air?"
+      "question": "A proposta fortalece ou ao menos não contradiz os valores da Azul?"
     },
     {
       "criterion": "Adequação ao público-alvo",
@@ -145,7 +145,7 @@
   ],
   "observations": [
     "Toda campanha deve ser testada em aeroportos piloto antes do rollout nacional.",
-    "A marca Inteli Air não deve ser associada a posicionamentos políticos ou religiosos.",
+    "A marca Azul não deve ser associada a posicionamentos políticos ou religiosos.",
     "Comunicações devem priorizar tom positivo, acolhedor e informativo.",
     "Feedbacks de clientes devem ser monitorados em até 48h após o lançamento.",
     "Projetos com impacto direto em segurança exigem aprovação adicional da área técnica."

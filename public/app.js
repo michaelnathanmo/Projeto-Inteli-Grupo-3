@@ -135,12 +135,12 @@ function renderLogin() {
     <div class="login-page">
       <div class="login-card">
         <div class="airline-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a56db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 2L11 13"></path>
             <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
           </svg>
         </div>
-        <h1>Inteli Air</h1>
+        <h1>Azul</h1>
         <p>Sistema de Comunicação entre Verticais e Marketing</p>
         <p style="font-size:0.8125rem;margin-bottom:24px;color:var(--gray-400);">Selecione seu perfil para acessar o sistema</p>
         <div class="role-options">
@@ -420,11 +420,11 @@ function renderHeader(role) {
   return `
     <header class="app-header">
       <div class="logo">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 2L11 13"></path>
           <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
         </svg>
-        Inteli Air
+        Azul
       </div>
       <div class="user-info">
         <span class="user-badge ${role}">${ROLE_LABELS[role]}</span>

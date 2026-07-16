@@ -1,4 +1,4 @@
-# Inteli Air — Sistema de Comunicação entre Verticais e Marketing
+# Azul — Sistema de Comunicação entre Verticais e Marketing
 
 Projeto acadêmico do Inteli Camp. Todos os dados são fictícios.
 
