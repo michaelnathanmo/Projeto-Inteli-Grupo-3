@@ -441,7 +441,7 @@ function renderHeader(role) {
           <path d="M22 2L11 13"></path>
           <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
         </svg>
-        Azul
+        Azul E.L.O.S.
       </div>
       <div class="user-info">
         <span class="user-badge ${role}">${ROLE_LABELS[role]}</span>
