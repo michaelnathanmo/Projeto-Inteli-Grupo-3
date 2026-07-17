@@ -1,7 +1,10 @@
 # Azul — Sistema de Comunicação entre Verticais e Marketing
-Time: Grupo 03 
-Membros: Lucas Mendes, Michael Oliveira, Roberto Veras, Luiza Rosito, Gustavo Trigo, Joana Gasperin, Edu Elias, Gabriel Padilha
+Grupo 03 
+Membros: Lucas Mendes, Michael Oliveira, Roberto Veras, Luiza Rosito, Gustavo Trigo, Joana Gasperin, Edu Elias, Gabriel Padilha, Luca Tavares e Thiago Hideki
 Projeto acadêmico do Inteli Camp. Todos os dados são fictícios.
+
+
+Url d apresentação: https://canva.link/9jdahb3whknoxlg
 
 **Problema central:** Falta de comunicação das Unidades de Negócio da Azul com o marketing — distanciamento da campanha aos ideais da empresa, falta de tempo para correção, perda de valor do produto.
 
